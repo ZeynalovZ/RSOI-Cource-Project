@@ -1,0 +1,14 @@
+http:
+  host: "0.0.0.0"
+  port: "8080"
+
+postgres:
+  host: "0.0.0.0"
+  port: "5432"
+  username: "postgres"
+  password: "postgres"
+  dbname: "sessions"
+  sslmode: "disable"
+
+token:
+  duration: 120m
