@@ -1,16 +1,12 @@
 package sessions
 
 import (
+	"github.com/Feokrat/music-dating-app/sessions/internal/models"
 	"github.com/Feokrat/music-dating-app/sessions/internal/sessions/schemas"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strings"
-
-	"github.com/Feokrat/music-dating-app/sessions/internal/sessions/schemas"
-
-	"github.com/Feokrat/music-dating-app/sessions/internal/models"
-
-	"github.com/gin-gonic/gin"
 )
 
 type handler struct {

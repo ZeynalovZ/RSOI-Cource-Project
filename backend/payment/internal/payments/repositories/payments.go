@@ -12,16 +12,15 @@ import (
 
 const (
 	paymentsTable = "payments"
-	active = "active"
-	cancelled = "canceled"
-	)
+	active        = "active"
+	cancelled     = "canceled"
+)
 
 type paymentsRepository struct {
-	 db *sqlx.DB
-	 logger *log.Logger
+	db     *sqlx.DB
+	logger *log.Logger
 }
 
-// если есть подпсика ещё работающая, не создавать новую, а поменять статус
 func (p paymentsRepository) CancellPayment(userId string) error {
 	query := fmt.Sprintf(`UPDATE %s SET status=$1 WHERE user_id = $2 AND status = $3`, paymentsTable)
 	_, err := p.db.Exec(query, cancelled, userId, active)
@@ -76,7 +75,6 @@ func (p paymentsRepository) CheckIfSubscriptionExists(userId string, subscriptio
 	}
 	return paymentsCount == 0, err
 }
-
 
 type PaymentsRepository interface {
 	GetPaymentsByUserId(userId string) (models.Payment, error)
