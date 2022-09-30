@@ -1,3 +1,5 @@
+create database payments;
+
 CREATE TABLE payments (
     id                  uuid PRIMARY KEY,
     user_id             VARCHAR(255) NOT NULL,

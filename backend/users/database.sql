@@ -51,3 +51,11 @@ CREATE TABLE users_to_musics
         ON DELETE NO ACTION
         NOT VALID
 );
+
+CREATE TABLE IF NOT EXISTS user_likes
+(
+    id uuid NOT NULL,
+    who uuid NOT NULL,
+    from_who uuid NOT NULL,
+    CONSTRAINT user_likes_pkey PRIMARY KEY (id)
+);

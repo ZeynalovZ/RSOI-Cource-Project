@@ -1,3 +1,4 @@
+create database sessions;
 CREATE TABLE credentials (
     id uuid PRIMARY KEY,
     login VARCHAR(80) NOT NULL,

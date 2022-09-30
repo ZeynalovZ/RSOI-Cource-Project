@@ -1,3 +1,5 @@
+Create database chat;
+
 CREATE TABLE chats (
     id                   uuid PRIMARY KEY,
     user_id1             uuid NOT NULL,
