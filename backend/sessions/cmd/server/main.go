@@ -2,14 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/config"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/sessions"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/sessions/repostiroties"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/pkg/HTTPserver"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/pkg/database"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/pkg/hash/bcrypt"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/pkg/token/jwt"
-	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +9,18 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Feokrat/music-dating-app/sessions/pkg/hash/bcrypt"
+
+	"github.com/Feokrat/music-dating-app/sessions/pkg/token/jwt"
+
+	"github.com/Feokrat/music-dating-app/sessions/internal/sessions/repostiroties"
+
+	"github.com/Feokrat/music-dating-app/sessions/internal/sessions"
+	"github.com/Feokrat/music-dating-app/sessions/pkg/database"
+	"github.com/jmoiron/sqlx"
+
+	"github.com/Feokrat/music-dating-app/sessions/internal/config"
+	"github.com/Feokrat/music-dating-app/sessions/pkg/HTTPserver"
 	"github.com/gin-gonic/gin"
 )
 
@@ -77,6 +81,6 @@ func buildHandler(logger *log.Logger, db *sqlx.DB, cfg *config.Config) http.Hand
 	hashService := bcrypt.NewBcryptHashService(cfg.Hash.Cost)
 	sessionService := sessions.NewService(logger, credentialRepository, sessionRepository, tokenService, hashService)
 
-	sessions.RegisterHandlers(rg.Group("/v1"), sessionService, logger)
+	sessions.RegisterHandlers(rg, sessionService, logger)
 	return router
 }

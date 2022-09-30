@@ -1,12 +1,14 @@
 package sessions
 
 import (
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/models"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/sessions/schemas"
+	"github.com/Feokrat/music-dating-app/sessions/internal/sessions/schemas"
 	"log"
 	"net/http"
 	"strings"
 
+	"github.com/Feokrat/music-dating-app/sessions/internal/sessions/schemas"
+
+	"github.com/Feokrat/music-dating-app/sessions/internal/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -67,7 +69,7 @@ func register(authService AuthService) gin.HandlerFunc {
 		token, err := authService.Register(registerModel)
 		if err != nil {
 			if err == schemas.UserAlreadyExistsError {
-				schemas.RespondWithError(c, http.StatusBadRequest, err.Error())
+				schemas.RespondWithError(c, http.StatusConflict, err.Error())
 				return
 			}
 			schemas.RespondWithError(c, http.StatusInternalServerError, err.Error())
@@ -81,18 +83,19 @@ func validate(authService AuthService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		reqToken := c.Request.Header.Get("Authorization")
 		splitToken := strings.Split(reqToken, "Bearer ")
-		reqToken = splitToken[2]
+		reqToken = splitToken[1]
 
 		token, err := authService.Authorize(reqToken)
 		if err != nil {
 			if err == schemas.UserAlreadyExistsError {
-				schemas.RespondWithError(c, http.StatusBadRequest, err.Error())
+				schemas.RespondWithError(c, http.StatusNotFound, err.Error())
 				return
 			}
 			schemas.RespondWithError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
-		schemas.RespondWithToken(c, http.StatusCreated, token)
+
+		schemas.RespondWithUserId(c, http.StatusOK, token)
 	}
 }
 

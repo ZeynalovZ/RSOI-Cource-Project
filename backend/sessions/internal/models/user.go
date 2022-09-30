@@ -1,12 +1,14 @@
 package models
 
+import "github.com/google/uuid"
+
 type Register struct {
-	Login    string `json:"login" bson:"login"`
-	Password string `json:"password" bson:"password"`
+	Login    string    `json:"login" bson:"login"`
+	Password string    `json:"password" bson:"password"`
+	UserId   uuid.UUID `json:"user_id"`
 }
 
 type Auth struct {
-	Id       string `json:"id" bson:"id"`
 	Login    string `json:"login" bson:"login"`
 	Password string `json:"password" bson:"password"`
 }

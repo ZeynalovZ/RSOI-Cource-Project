@@ -3,9 +3,9 @@ package repostiroties
 import (
 	"database/sql"
 	"fmt"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/models"
 	"log"
 
+	"github.com/Feokrat/music-dating-app/sessions/internal/models"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -40,8 +40,19 @@ func (s sessionRepository) GetSessionByUserId(userId string) (models.Sessions, e
 	return session, err
 }
 
+func (s sessionRepository) GetSessionById(sessionId string) (models.Sessions, error) {
+	var session models.Sessions
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE id = $1`, sessionTable)
+	err := s.db.Get(&session, query, sessionId)
+	if err == sql.ErrNoRows {
+		return session, NotFoundError
+	}
+	return session, err
+}
+
 type SessionRepository interface {
 	GetSessionByUserId(userId string) (models.Sessions, error)
+	GetSessionById(sessionId string) (models.Sessions, error)
 	AddSession(session models.Sessions) (string, error)
 }
 

@@ -2,9 +2,9 @@ package database
 
 import (
 	"fmt"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/config"
 	"log"
 
+	"github.com/Feokrat/music-dating-app/sessions/internal/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )

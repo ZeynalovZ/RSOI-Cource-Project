@@ -1,13 +1,15 @@
 package sessions
 
 import (
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/models"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/sessions/repostiroties"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/sessions/schemas"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/pkg/hash"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/pkg/token"
-	"github.com/google/uuid"
+	"github.com/Feokrat/music-dating-app/sessions/internal/models"
+	"github.com/Feokrat/music-dating-app/sessions/internal/sessions/schemas"
 	"log"
+
+	"github.com/Feokrat/music-dating-app/sessions/internal/sessions/repostiroties"
+
+	"github.com/Feokrat/music-dating-app/sessions/pkg/hash"
+	"github.com/Feokrat/music-dating-app/sessions/pkg/token"
+	"github.com/google/uuid"
 )
 
 type AuthService struct {
@@ -32,15 +34,8 @@ func NewService(logger *log.Logger, credentialRepository repostiroties.Credentia
 }
 
 func (a AuthService) SignIn(userInfo models.Auth) (string, error) {
-	session, err := a.sessionRepository.GetSessionByUserId(userInfo.Id)
-	if err != nil {
-		if err == repostiroties.NotFoundError {
-			return "", schemas.InvalidCredentialsError
-		}
-		return "", err
-	}
 
-	credentials, err := a.credentialRepository.GetCredentialBySessionId(session.Id)
+	credentials, err := a.credentialRepository.GetCredentialByLogin(userInfo.Login)
 	if err != nil {
 		if err == repostiroties.NotFoundError {
 			return "", schemas.InvalidCredentialsError
@@ -51,7 +46,13 @@ func (a AuthService) SignIn(userInfo models.Auth) (string, error) {
 	if err = a.hashService.ValidatePassword(userInfo.Password, credentials.PasswordHash); err != nil {
 		return "", schemas.InvalidCredentialsError
 	}
-	return a.tokenService.GenerateToken(userInfo.Id)
+
+	session, err := a.sessionRepository.GetSessionById(credentials.SessionId)
+	if err == repostiroties.NotFoundError {
+		return "", schemas.InvalidCredentialsError
+	}
+
+	return session.AccessToken, nil
 }
 
 func (a AuthService) Register(registerModel models.Register) (string, error) {
@@ -77,16 +78,17 @@ func (a AuthService) Register(registerModel models.Register) (string, error) {
 	}
 
 	// temp usage of user_id
-	var userId = uuid.New().String()
-	token, _ := a.tokenService.GenerateToken(userId)
+	var userId = registerModel.UserId
+	token, _ := a.tokenService.GenerateToken(userId.String())
 
 	var session models.Sessions
 	session.Id = credential.SessionId
 	session.IsAuthenticated = true
-	session.ExpiresAt = credential.SessionId
+	// TODO: real expiration here is needed
+	session.ExpiresAt = "10-12-2023"
 	session.AccessToken = token
 	session.RefreshToken = token
-	session.UserID = userId
+	session.UserID = userId.String()
 
 	_, err = a.sessionRepository.AddSession(session)
 	if err != nil {

@@ -34,6 +34,7 @@ func (t JWTTokenService) ParseToken(signedToken string) (string, error) {
 		}
 		return []byte(t.signingKey), nil
 	})
+
 	if err != nil {
 		return "", err
 	}

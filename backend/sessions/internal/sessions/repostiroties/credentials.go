@@ -3,9 +3,9 @@ package repostiroties
 import (
 	"database/sql"
 	"fmt"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/models"
 	"log"
 
+	"github.com/Feokrat/music-dating-app/sessions/internal/models"
 	"github.com/jmoiron/sqlx"
 )
 

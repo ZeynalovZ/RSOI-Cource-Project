@@ -2,9 +2,9 @@ package HTTPserver
 
 import (
 	"context"
-	"github.com/ZeynalovZ/RSOI-Course-Project/sessions/internal/config"
 	"net/http"
 
+	"github.com/Feokrat/music-dating-app/sessions/internal/config"
 )
 
 type HTTPserver struct {

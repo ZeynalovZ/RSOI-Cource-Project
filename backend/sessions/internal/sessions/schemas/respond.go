@@ -26,10 +26,10 @@ func RespondWithData(c *gin.Context, statusCode int, data interface{}) {
 	c.JSON(statusCode, dataResponse{data})
 }
 
-func RespondWithId(c *gin.Context, statusCode int, id int) {
+func RespondWithUserId(c *gin.Context, statusCode int, id string) {
 	c.JSON(statusCode, idResponse{id})
 }
 
 func RespondWithToken(c *gin.Context, statusCode int, token string) {
-	c.JSON(statusCode, idResponse{token})
+	c.JSON(statusCode, tokenResponse{token})
 }

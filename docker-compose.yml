@@ -1,0 +1,76 @@
+version: '3.7'
+
+services:
+  gateway:
+    image: "mdatest/gateway:latest"
+    container_name: gateway
+    restart: always
+    ports:
+      - 8090:8090
+    networks:
+      - mdaNetwork
+
+  notifications:
+    image: "mdatest/notifications"
+    container_name: notifications
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - mdaNetwork
+
+  payment:
+    image: "mdatest/payment"
+    container_name: payment
+    restart: always
+    ports:
+      - 8070:8070
+    networks:
+      - mdaNetwork
+  
+  sessions:
+    image: "mdatest/sessions"
+    container_name: sessions
+    restart: always
+    ports:
+      - 8060:8060
+    networks:
+      - mdaNetwork
+
+  users:
+    image: "mdatest/users"
+    container_name: users
+    restart: always
+    ports:
+      - 8050:8050
+    networks:
+      - mdaNetwork
+
+  frontend:
+    image: mdatest/frontend:latest
+    container_name: frontend
+    restart: always
+    ports:
+      - 80:3000
+    networks:
+      - mdaNetwork
+    
+  postgres:
+    image: "postgres:14.5"
+    container_name: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    networks:
+      - mdaNetwork
+
+networks:
+  mdaNetwork:
+    

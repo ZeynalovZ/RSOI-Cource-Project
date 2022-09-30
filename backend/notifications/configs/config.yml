@@ -1,0 +1,11 @@
+http:
+  host: "0.0.0.0"
+  port: "8080"
+
+postgres:
+  host: "postgres"
+  port: "5432"
+  username: "postgres"
+  password: "postgres"
+  dbname: "chat"
+  sslmode: "disable"
