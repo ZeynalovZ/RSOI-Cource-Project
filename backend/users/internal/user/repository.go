@@ -24,6 +24,7 @@ type Repository interface {
 	DeleteById(id uuid.UUID) error
 	CreateMusicToUser(models.UserToMusic) error
 	CreateUserImage(image models.Image) error
+	UpdateUserImage(userId uuid.UUID, image string) error
 	GetUserImage(id uuid.UUID) (models.Image, error)
 	GetAll(page, size int) ([]models.User, error)
 	GetRecommendationsForUser(userId uuid.UUID, page int, size int) ([]models.User, error)
@@ -162,6 +163,12 @@ func (r repository) Update(id uuid.UUID, user models.UpdateUserInfo) error {
 	_, err := r.db.Exec(query, args...)
 
 	return err
+}
+
+func (r repository) UpdateUserImage(userId uuid.UUID, image string) error {
+
+	return nil
+
 }
 
 func (r repository) DeleteById(id uuid.UUID) error {

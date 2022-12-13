@@ -297,11 +297,8 @@ func (h handler) updateUserById(ctx *gin.Context) {
 	}
 
 	err = h.service.UpdateUserInfo(userId, models.UpdateUserInfo{
-		Name:        requestModel.Name,
-		Surname:     requestModel.Surname,
-		Email:       requestModel.Email,
-		PhoneNumber: requestModel.PhoneNumber,
-		HasAccess:   requestModel.HasAccess,
+		Name:    requestModel.Name,
+		Surname: requestModel.Surname,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
@@ -309,6 +306,8 @@ func (h handler) updateUserById(ctx *gin.Context) {
 		})
 		return
 	}
+
+	err = h.service.AddImageToUser(models.Image{UserId: userId, Image: requestModel.Image, Id: uuid.New()})
 
 	ctx.JSON(http.StatusOK, nil)
 }

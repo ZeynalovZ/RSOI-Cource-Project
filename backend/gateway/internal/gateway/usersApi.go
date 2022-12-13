@@ -3,6 +3,7 @@ package gateway
 import (
 	"fmt"
 	"github.com/Feokrat/music-dating-app/gateway/internal/TokenValidator"
+	"github.com/Feokrat/music-dating-app/gateway/internal/models"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,7 +23,7 @@ type handler struct {
 func RegisterUsersHandlers(rg *gin.RouterGroup, service UsersService, validationService TokenValidator.ValidationService, logger *log.Logger) {
 	h := handler{service, logger, validationService}
 
-	rg.PUT("/users/:id", h.updateUserById)
+	rg.PUT("/users", h.updateUserById)
 	rg.GET("/users", h.getUserById)
 	rg.DELETE("/users/:id", h.deleteUserById)
 	rg.GET("/users/list", h.getAllUsers)
@@ -119,7 +120,25 @@ func (h handler) createEmptyUser(ctx *gin.Context) {
 }
 
 func (h handler) updateUserById(ctx *gin.Context) {
-	var requestModel schemas.UserRequest
+
+	reqToken := ctx.Request.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+	reqToken = splitToken[1]
+
+	userId, err := h.validationService.Validate(reqToken)
+
+	if err != nil {
+		h.logger.Printf("could not parse user id %v, error: %s",
+			userId, err.Error())
+		ctx.JSON(http.StatusBadRequest, schemas.ValidationErrorResponse{
+			Message: "wrong user id format",
+			Errors:  err.Error(),
+		})
+
+		return
+	}
+
+	var requestModel models.UpdateUserInfo
 	if err := ctx.BindJSON(&requestModel); err != nil {
 		h.logger.Printf("request body in wrong format, error: %s",
 			err.Error())
@@ -130,27 +149,18 @@ func (h handler) updateUserById(ctx *gin.Context) {
 		return
 	}
 
-	//id, err := h.service.AddUser(models.User{
-	//	Id:          uuid.New(),
-	//	Name:        requestModel.Name,
-	//	Surname:     requestModel.Surname,
-	//	Email:       requestModel.Email,
-	//	PhoneNumber: requestModel.PhoneNumber,
-	//	HasAccess:   requestModel.HasAccess,
-	//})
-	id := 1
+	code, err := h.service.UpdateUserInfo(userId, requestModel)
 
-	//if err != nil {
-	//	h.logger.Printf("could not add user %v, error: %s",
-	//		requestModel, err.Error())
-	//	ctx.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
-	//		Message: err.Error(),
-	//	})
-	//	return
-	//}
+	if err != nil {
+		h.logger.Printf("request body in wrong format, error: %s",
+			err.Error())
+		ctx.JSON(http.StatusInternalServerError, schemas.ValidationErrorResponse{
+			Message: "error has occured during updating user info",
+			Errors:  err.Error(),
+		})
+	}
 
-	ctx.Header("Location", fmt.Sprintf("/api/v1/users/%v", id))
-	ctx.JSON(http.StatusCreated, "")
+	ctx.JSON(code, "")
 }
 
 func (h handler) getUserById(ctx *gin.Context) {

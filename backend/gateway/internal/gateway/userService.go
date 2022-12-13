@@ -3,6 +3,7 @@ package gateway
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -16,7 +17,7 @@ import (
 
 type UsersService interface {
 	AddUser(request schemas.UserRequest) (uuid.UUID, error)
-	UpdateUserInfo(id uuid.UUID, user models.UpdateUserInfo) error
+	UpdateUserInfo(id uuid.UUID, user models.UpdateUserInfo) (int, error)
 	GetUserById(id uuid.UUID) (schemas.UserResponse, int, error)
 	DeleteUserById(id uuid.UUID) (int, error)
 	GetAllUsers(page, size int) (schemas.UsersResponse, int, error)
@@ -103,8 +104,35 @@ func (s usersService) LikeUser(whoLikedId uuid.UUID, whomLikedId uuid.UUID) (sch
 	return like, resp.StatusCode, nil
 }
 
-func (s usersService) UpdateUserInfo(id uuid.UUID, user models.UpdateUserInfo) error {
-	return nil
+func (s usersService) UpdateUserInfo(id uuid.UUID, user models.UpdateUserInfo) (int, error) {
+	userServiceUrl := s.config.UserService + fmt.Sprintf("/api/v1/users/%v", id)
+	s.logger.Print(userServiceUrl)
+
+	var userBytes bytes.Buffer
+	err := json.NewEncoder(&userBytes).Encode(user)
+	if err != nil {
+		s.logger.Printf("could not convert to io read user, error: %s", err.Error())
+		return 0, err
+	}
+
+	req, err := http.NewRequest("PUT", userServiceUrl, &userBytes)
+	if err != nil {
+		s.logger.Printf("could not create request, error: %s", err.Error())
+		return 0, err
+	}
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		s.logger.Printf("could not get user info, error: %s", err.Error())
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return resp.StatusCode, errors.New("error occurred during updating user info")
+	}
+
+	return 0, nil
 }
 
 func (s usersService) GetUserImage(userId uuid.UUID) (schemas.UserImageResponse, int, error) {
